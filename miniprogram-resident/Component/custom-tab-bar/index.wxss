@@ -1,0 +1,45 @@
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 10%;
+  right: 0;
+  height: 96rpx;
+  background: white;
+  display: flex;
+  padding-bottom: env(safe-area-inset-bottom);
+  width: 80%;
+  background-color: aqua;
+  border-radius: 100% 100% 0 0;
+  opacity: 0.8;
+}
+
+.tab-bar-border {
+  background-color: rgba(0, 0, 0, 0.33);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 2rpx;
+  transform: scaleY(0.5);
+}
+
+.tab-bar-item {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.tab-bar-item .image {
+  width: 27px;
+  height: 27px;
+}
+
+.tab-bar-item .cover-item {
+  font-size: 10px;
+}
+
+
+

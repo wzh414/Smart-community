@@ -1,0 +1,13 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="record" bindtap="record">
+    <text>录入记录</text>
+  </view>
+  <view class="title">
+    <text>xxx小区出入检测</text>
+  </view>
+  <view class="test"></view>
+  <view class="btn">
+    <button bindtap="toScanCode">扫描出入人员通行码</button>
+  </view>
+</view>

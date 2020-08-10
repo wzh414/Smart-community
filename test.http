@@ -1,0 +1,28 @@
+POST http://localhost:8080/login?username=root&password=root
+Accept: */*
+Cache-Control: no-cache
+
+###
+POST http://localhost:8080/test
+Accept: */*
+Cache-Control: no-cache
+
+###
+POST http://localhost:8080/authentication
+Content-Type: application/json
+
+{
+  "username": "check1",
+  "password": "check"
+}
+
+###
+POST http://localhost:8080/test
+Authentication: eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE1OTQzMjkyOTMsInN1YiI6ImNoZWNrMSIsImNyZWF0ZWQiOjE1OTA3MjkyOTM0ODh9.j-sdoVmEHwioVU4NalknAKm-JV6cOwL-x-IIQPOvoEH1wpFnxgU-cy8ASXLghFtGRVlf2NcUO89KwdT5JdWQpA
+
+
+###
+GET https://api.weixin.qq.com/sns/jscode2session?appid=wxe5c44f19527e0032&secret=e9c24783a75ed77d0e35a154188cfe32&js_code=023C93IG1OVij3092jHG1sZcIG1C93IB&grant_type=authorization_code
+
+###
+POST http://localhost:8080/api/resource/getOpenId?code=0238uysZ1OmggV0lOwqZ1E1HsZ18uysQ

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ManageCheck</title>
+    <link rel="stylesheet" href="https://css-1300972980.cos.ap-shanghai.myqcloud.com/use/root.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.2/theme-chalk/index.css">
+
+</head>
+<body>
+<div id="app">
+    <el-card class="box-card">
+        <el-form :inline="true" class="demo-form-inline" >
+            <el-form-item label="搜索">
+                <el-input
+                        placeholder="输入账号或昵称搜索"
+                        v-model="input"
+                        @keyup.enter.native="onSearch"
+                        clearable>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="隐藏" style="display: none">
+                <el-input/>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="onSearch" icon="el-icon-search">搜索</el-button>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="success" @click="addCheck" icon="el-icon-plus">新增</el-button>
+            </el-form-item>
+        </el-form>
+    </el-card>
+    <el-table
+            v-loading="tableLoad"
+            :data="tableData"
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="userId"
+                label="检查人员ID"
+                width="250">
+        </el-table-column>
+        <el-table-column
+                prop="username"
+                label="账号"
+                width="250">
+        </el-table-column>
+        <el-table-column
+                prop="nickname"
+                label="昵称"
+                width="250">
+        </el-table-column>
+        <el-table-column
+                label="账号状态"
+                width="250">
+            <template slot-scope="scope">
+                <el-tag v-if="scope.row.userStatus===0" size="medium">正常</el-tag>
+                <el-tag v-else type="danger" size="medium">禁用</el-tag>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="操作"
+                width="685"
+        >
+            <template slot-scope="scope">
+                <el-popover
+                        placement="top"
+                        width="200"
+                        v-model="tableData[scope.$index].editPassVisible">
+                    <el-input type="password" v-model="tableData[scope.$index].passwordInput" placeholder="请输入新密码"></el-input>
+                    <div style="text-align: right; margin-top: 6px">
+                        <el-button size="mini" type="text" @click="tableData[scope.$index].passwordInput='',tableData[scope.$index].editPassVisible = false">取消</el-button>
+                        <el-button type="primary" size="mini" @click="handleEditPass(scope.$index,scope.row)">确定</el-button>
+                    </div>
+                    <el-button slot="reference" size="mini">修改密码</el-button>
+                </el-popover>
+                <el-popover
+                        placement="top"
+                        width="200"
+                        v-model="tableData[scope.$index].editNicknameVisible">
+                    <el-input v-model="tableData[scope.$index].nicknameInput" placeholder="请输入新昵称"></el-input>
+                    <div style="text-align: right; margin-top: 6px">
+                        <el-button size="mini" type="text" @click="tableData[scope.$index].nicknameInput='', tableData[scope.$index].editNicknameVisible = false">取消</el-button>
+                        <el-button type="primary" size="mini" @click="handleEditNick(scope.$index,scope.row)">确定</el-button>
+                    </div>
+                    <el-button slot="reference" size="mini">修改昵称</el-button>
+                </el-popover>
+<!--                <el-popover-->
+<!--                        placement="top"-->
+<!--                        width="200"-->
+<!--                        v-model="tableData[scope.$index].deleteVisible">-->
+<!--                    <p>删除后无法恢复，确定删除吗？</p>-->
+<!--                    <div style="text-align: right; margin: 0">-->
+<!--                        <el-button size="mini" type="text" @click="tableData[scope.$index].deleteVisible = false">取消</el-button>-->
+<!--                        <el-button type="primary" size="mini" @click="handleDelete(scope.$index,scope.row)">确定</el-button>-->
+<!--                    </div>-->
+<!--                    <el-button slot="reference" size="mini" type="danger">删除</el-button>-->
+<!--                </el-popover>-->
+                <el-popover
+                        v-if="scope.row.userStatus===0"
+                        placement="top"
+                        width="160"
+                        v-model="tableData[scope.$index].disableVisible">
+                    <p>确定禁用此账号吗？</p>
+                    <div style="text-align: right; margin: 0">
+                        <el-button size="mini" type="text" @click="tableData[scope.$index].disableVisible = false">取消</el-button>
+                        <el-button type="primary" size="mini" @click="handleDisable(scope.$index,scope.row)">确定</el-button>
+                    </div>
+                    <el-button slot="reference" size="mini" type="info">禁用账号</el-button>
+                </el-popover>
+                <el-popover
+                        v-else
+                        placement="top"
+                        width="160"
+                        v-model="tableData[scope.$index].enableVisible">
+                    <p>确定解禁此账号吗？</p>
+                    <div style="text-align: right; margin: 0">
+                        <el-button size="mini" type="text" @click="tableData[scope.$index].enableVisible = false">取消</el-button>
+                        <el-button type="primary" size="mini" @click="handleEnable(scope.$index,scope.row)">确定</el-button>
+                    </div>
+                    <el-button slot="reference" size="mini" type="warning">解除禁用</el-button>
+                </el-popover>
+            </template>
+        </el-table-column>
+    </el-table>
+    <el-pagination
+            background
+            layout="total, prev, pager, next, jumper"
+            @current-change="handleCurrentChange"
+            :current-page.sync="page"
+            :total="total">
+    </el-pagination>
+</div>
+
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/init/root.js"></script>
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/use/vue/vue.min.js"></script>
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/use/element-ui/element-ui-index.js"></script>
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/use/axios/axios.min.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                tableData: [],
+                page: 1,
+                total: 0,
+                tableLoad: false,
+                input:''
+            }
+        },
+        mounted() {
+            this.getCheckList();
+        },
+        methods: {
+            addCheck(){
+                parent.app.addCheckVisible = true;
+            },
+
+            handleEditPass(index, row) {
+                if(this.tableData[index].passwordInput === ''){
+                    this.$message({
+                        type: 'error',
+                        message: '密码不能为空'
+                    });
+                }
+                else if(!this.tableData[index].passwordInput.match(/^[@!\-#$%&*a-zA-Z0-9]+$/)){
+                    this.$message({
+                        type: 'error',
+                        message: '密码非法'
+                    });
+                }
+                else {
+                    let newPass = this.tableData[index].passwordInput;
+                    this.tableData[index].passwordInput = '';
+                    this.tableData[index].editPassVisible = false;
+                    axios.post('/check/data/modifyCheckPass', 'userId='+this.tableData[index].userId+
+                        '&password='+newPass)
+                        .then ((res)=>{
+                            if(res.data === 'success'){
+                                this.$message({
+                                    type: 'success',
+                                    message: '修改成功'
+                                });
+                                this.getCheckList();
+                            }else{
+                                this.$message({
+                                    type: 'error',
+                                    message: '修改失败，请重试'
+                                });
+                            }
+                        }).catch(()=> {
+                        this.$message({
+                            type: 'error',
+                            message: '修改错误，请重试'
+                        });
+                    })
+                }
+            },
+            handleEditNick(index, row) {
+                if(this.tableData[index].nicknameInput === ''){
+                    this.$message({
+                        type: 'error',
+                        message: '昵称不能为空'
+                    });
+                }
+                else if(this.tableData[index].nicknameInput.indexOf(" ") > -1){
+                    this.$message({
+                        type: 'error',
+                        message: '昵称非法'
+                    });
+                }
+                else {
+                    let newNickname = this.tableData[index].nicknameInput;
+                    this.tableData[index].nicknameInput = '';
+                    this.tableData[index].editNicknameVisible = false;
+                    axios.post('/check/data/modifyCheckNickname', 'userId='+this.tableData[index].userId+
+                        '&nickname='+newNickname)
+                        .then ((res)=>{
+                            if(res.data === 'success'){
+                                this.$message({
+                                    type: 'success',
+                                    message: '修改成功'
+                                });
+                                this.getCheckList();
+                            }else{
+                                this.$message({
+                                    type: 'error',
+                                    message: '修改失败，请重试'
+                                });
+                            }
+                        }).catch(()=> {
+                        this.$message({
+                            type: 'error',
+                            message: '修改错误，请重试'
+                        });
+                    })
+                }
+            },
+            handleDelete(index, row) {
+                this.tableData[index].deleteVisible = false;
+                axios.post('/check/data/deleteCheck', 'userId='+this.tableData[index].userId)
+                    .then ((res)=>{
+                        if(res.data === 'success'){
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功'
+                            });
+                            this.getCheckList();
+                        }else{
+                            this.$message({
+                                type: 'error',
+                                message: '删除失败，请重试'
+                            });
+                        }
+                    }).catch(()=> {
+                    this.$message({
+                        type: 'error',
+                        message: '删除错误，请重试'
+                    });
+                })
+            },
+            handleDisable(index, row) {
+                this.tableData[index].disableVisible = false;
+                axios.post('/check/data/disableCheck', 'userId='+this.tableData[index].userId)
+                    .then ((res)=>{
+                        if(res.data === 'success'){
+                            this.$message({
+                                type: 'success',
+                                message: '禁用成功'
+                            });
+                            this.tableData[index].userStatus = 1;
+                        }else{
+                            this.$message({
+                                type: 'error',
+                                message: '禁用失败，请重试'
+                            });
+                        }
+                    }).catch(()=> {
+                    this.$message({
+                        type: 'error',
+                        message: '禁用错误，请重试'
+                    });
+                })
+            },
+            handleEnable(index, row) {
+                this.tableData[index].enableVisible = false;
+                axios.post('/check/data/enableCheck', 'userId='+this.tableData[index].userId)
+                    .then ((res)=>{
+                        if(res.data === 'success'){
+                            this.$message({
+                                type: 'success',
+                                message: '解禁成功'
+                            });
+                            this.tableData[index].userStatus = 0;
+                        }else{
+                            this.$message({
+                                type: 'error',
+                                message: '解禁失败，请重试'
+                            });
+                        }
+                    }).catch(()=> {
+                    this.$message({
+                        type: 'error',
+                        message: '解禁错误，请重试'
+                    });
+                })
+            },
+            handleCurrentChange() {
+                console.log(`当前页: ${this.page}`);
+                this.getCheckList();
+            },
+            onSearch() {
+                this.getCheckList();
+            },
+            getCheckList(){
+                this.tableLoad = true;
+                axios.post('/check/data/listAllCheck','pageNum='+this.page+'&search='+this.input)
+                    .then((res) => {
+                        this.tableLoad = false;
+                        this.total = res.data.totalElements;
+                        let bufferList = [];
+                        for(var key = 0;key< res.data.content.length;key++){
+                            let i = {};
+                            i.userId = res.data.content[key].userId;
+                            i.username = res.data.content[key].username;
+                            i.nickname = res.data.content[key].nickname;
+                            i.userStatus = res.data.content[key].userStatus;
+                            i.editPassVisible = false;
+                            i.passwordInput = '';
+                            i.editNicknameVisible = false;
+                            i.nicknameInput = '';
+                            i.deleteVisible = false;
+                            i.disableVisible = false;
+                            i.enableVisible = false;
+                            bufferList.push(i);
+                        }
+                        this.tableData = bufferList;
+                    }).catch(() => {
+                    this.$message({
+                        type: 'error',
+                        message: '获取数据失败，请重试'
+                    });
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

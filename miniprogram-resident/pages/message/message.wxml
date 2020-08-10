@@ -1,0 +1,34 @@
+<!--pages/message/message.wxml-->
+<view class="back">
+  <view class="weui-cells weui-cells_after-title">
+      <view class="weui-cell">
+          <view class="weui-cell__bd">姓名</view>
+          <view class="weui-cell__ft">{{user.residentName}}</view>
+      </view>
+  </view>
+  <view class="weui-cells weui-cells_after-title">
+      <view class="weui-cell">
+          <view class="weui-cell__bd">身份证号</view>
+          <view class="weui-cell__ft">{{user.idCardNumber}}</view>
+      </view>
+  </view>
+  <view class="weui-cells weui-cells_after-title">
+      <view class="weui-cell">
+          <view class="weui-cell__bd">电话号码</view>
+          <view class="weui-cell__ft">{{user.phoneNumber}}</view>
+      </view>
+  </view>
+  <view class="weui-cells weui-cells_after-title">
+      <view class="weui-cell">
+          <view class="weui-cell__bd">所在单元</view>
+          <view class="weui-cell__ft">{{user.homeNumber}}</view>
+      </view>
+  </view>
+  <view class="weui-cells weui-cells_after-title">
+      <view class="weui-cell">
+          <view class="weui-cell__bd">是否锁定</view>
+          <view class="weui-cell__ft" wx:if="{{user.locked}}">是</view>
+          <view class="weui-cell__ft" wx:else>否</view>
+      </view>
+  </view>
+</view>

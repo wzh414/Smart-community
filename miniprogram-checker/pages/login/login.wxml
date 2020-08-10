@@ -1,0 +1,19 @@
+<!--pages/login/login.wxml-->
+<view class="login">
+  <view class="title">
+    <text>xxx小区检测人员登录</text>
+  </view>
+  <form bindsubmit="toLogin">
+    <view class="login-item">
+      <view class="item">
+        <text class="iconfont icon-username"></text>
+        <input placeholder="请输入账号" name="username" value=""></input>
+      </view>
+      <view class="item">
+        <text class="iconfont icon-password"></text>
+        <input placeholder="请输入密码" name="password" value="" password="true"></input>
+      </view>
+    </view>
+    <button class="btn" form-type="submit">登录</button>
+  </form>
+</view>

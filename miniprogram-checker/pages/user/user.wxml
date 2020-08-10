@@ -1,0 +1,78 @@
+<!--pages/user/user.wxml-->
+<view class="page">
+    <view wx:if="{{topTips}}" class="weui-toptips weui-toptips_warn fadeIn {{hide ? 'fadeOut' : ''}}">
+    该人员最近有{{user.high}}次温度异常，请注意！！
+  </view>
+  <view class="{{topTips?'down':''}}">
+    <view class="weui-cells">
+        <view class="weui-cell weui-cell_active">
+            <view class="weui-cell__hd" style="position: relative; margin-right: 10px;">
+                <image src="{{user.avatar}}" style="height:50px; width: 50px; display: block;"></image>
+            </view>
+            <view class="weui-cell__bd">
+                <view>{{user.name}}</view>
+                <view style="font-size: 13px; color: #888;">{{user.homeNumber}}</view>
+            </view>
+        </view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell">
+                <view class="weui-cell__bd">身份证</view>
+                <view class="weui-cell__ft">{{user.idCard}}</view>
+            </view>
+        </view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell">
+                <view class="weui-cell__bd">出入次数</view>
+                <view class="weui-cell__ft">{{user.times}}</view>
+            </view>
+        </view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell">
+                <view class="weui-cell__bd">电话号码</view>
+                <view class="weui-cell__ft">{{user.phoneNumber}}</view>
+            </view>
+        </view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell">
+                <view class="weui-cell__bd">状态</view>
+                <view class="weui-cell__ft" wx:if="{{user.locked==1}}">锁定</view>
+                <view class="weui-cell__ft" wx:else>未锁定</view>
+            </view>
+        </view>
+    </view>
+  </view>
+  <view class="page__bd page__bd_spacing btn">
+    <button class="weui-btn weui-btn_default" bindtap="open2" disabled="{{user.locked==1?ture:false}}">录入体温</button>
+	</view>
+  <view class="fadeIn" wx:if="{{dialog2}}">
+      <view class="weui-mask" bindtap="close2"></view>
+      <view class="weui-half-screen-dialog">
+          <view class="weui-half-screen-dialog__hd">
+              <view class="weui-half-screen-dialog__hd__side" bindtap="close2">
+                  <a class="weui-icon-btn">返回<i class="weui-icon-back-arrow-thin"></i></a>
+              </view>
+              <view class="weui-half-screen-dialog__hd__main">
+                  <strong class="weui-half-screen-dialog__title">体温录入</strong>
+              </view>
+          </view>
+          <form catchsubmit="formSubmit">
+            <view class="weui-half-screen-dialog__bd temperature">
+                <text class="data">当前日期：{{current}}</text>
+                <view class="input">
+                  <text>输入体温：</text>
+                  <input type="digit" name="temperature" placeholder="输入体温数字(单位为℃)"></input>
+                  <input hidden="true" name="residentId" value="{{user.id}}"></input>
+                  <input hidden="true" name="residentName" value="{{user.name}}"></input>
+                  <input hidden="true" name="checkerId" value="{{checker.id}}"></input>
+                  <input hidden="true" name="checkerName" value="{{checker.name}}"></input>
+                </view>
+            </view>
+            <view class="weui-half-screen-dialog__ft">
+                <button class="weui-btn weui-btn_primary" form-type="submit">录入</button>
+            </view>
+          </form>
+      </view>
+  </view>
+  
+
+</view>

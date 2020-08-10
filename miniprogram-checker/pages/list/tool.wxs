@@ -1,0 +1,12 @@
+var split = function(data){
+  var test = data.split(".")
+  var test2 = test[0].split("T")
+  var test3 = test2[1].split(":")
+  var test4 = parseInt(test3[0])
+  test4 = test4 + 8
+  var test5 = test2[0] + " " + test4 + ":" + test3[1]
+  return test5
+}
+module.exports = {
+  split:split
+}

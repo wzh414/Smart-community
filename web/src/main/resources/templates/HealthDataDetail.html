@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HealthDataDetail</title>
+    <link rel="stylesheet" href="https://css-1300972980.cos.ap-shanghai.myqcloud.com/use/root.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.2/theme-chalk/index.css">
+
+    <style>
+        .el-dropdown-link {
+            cursor: pointer;
+            color: #409EFF;
+        }
+        .el-icon-arrow-down {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-card class="box-card">
+        <el-form :inline="true" class="demo-form-inline" >
+            <el-form-item label="搜索">
+                <el-input
+                        placeholder="输入住户姓名搜索"
+                        v-model="input"
+                        @keyup.enter.native="onSearch"
+                        clearable>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="隐藏" style="display: none">
+                <el-input/>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="onSearch" icon="el-icon-search">搜索</el-button>
+            </el-form-item>
+        </el-form>
+    </el-card>
+    <el-table
+            v-loading="tableLoad"
+            :data="list"
+            @sort-change="changeSort"
+            border
+            align="center"
+            style="width: 100%">
+        <el-table-column
+                prop="residentId"
+                label="住户ID"
+                width="200">
+        </el-table-column>
+        <el-table-column
+                prop="residentName"
+                label="住户姓名"
+                width="200">
+        </el-table-column>
+        <el-table-column
+                prop="idCardNumber"
+                label="身份证号"
+                width="200">
+        </el-table-column>
+        <el-table-column
+                prop="homeNumber"
+                label="住户房号"
+                width="200">
+        </el-table-column>
+        <el-table-column
+                prop="totalCheckTimes"
+                label="总出入次数"
+                sortable="custom"
+                width="200">
+        </el-table-column>
+        <el-table-column
+                prop="lastSevenDayTimes"
+                label="最近7天出入次数"
+                sortable="custom"
+                width="200">
+        </el-table-column>
+        <el-table-column
+                prop="lastSevenDayHighTimes"
+                label="最近7天体温异常次数"
+                sortable="custom"
+                width="200">
+        </el-table-column>
+        <el-table-column
+                label="操作"
+                width="285"
+        >
+            <template slot-scope="scope">
+                <el-button slot="reference" size="mini" @click="getDetail(scope.row.residentId)">出入数据详情</el-button>
+            </template>
+        </el-table-column>
+
+    </el-table>
+    <el-pagination
+            background
+            layout="total, prev, pager, next, jumper"
+            @current-change="handleCurrentChange"
+            :current-page.sync="page"
+            :total="total">
+    </el-pagination>
+</div>
+
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/init/root.js"></script>
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/use/vue/vue.min.js"></script>
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/use/element-ui/element-ui-index.js"></script>
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/use/axios/axios.min.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                tableData: [],
+                list: [],
+                page: 1,
+                total: 0,
+                tableLoad: false,
+                input:''
+            }
+        },
+        mounted() {
+            this.getHealthDataList();
+        },
+        methods: {
+            handleCurrentChange() {
+                console.log(`当前页: ${this.page}`);
+                this.getList();
+            },
+            onSearch() {
+                this.getList();
+            },
+            getHealthDataList() {
+                this.tableLoad = true;
+                axios.post('/health/data/listAllResident', 'pageNum=' + this.page)
+                    .then((res) => {
+                        this.tableLoad = false;
+                        this.total = res.data.totalElements;
+                        this.tableData = res.data.content;
+                        this.getList();
+                    }).catch(() => {
+                    this.$message({
+                        type: 'error',
+                        message: '获取数据失败，请重试'
+                    });
+                });
+            },
+            getList() {
+                //  es6过滤得到满足搜索条件的展示数据list
+                let list = this.tableData.filter((item, index) =>
+                    item.residentName.includes(this.input)
+                )
+                //分页的总数据
+                this.total = list.length
+                //过滤分页
+                this.list = list.filter((item, index) =>
+                    index < this.page * 10 && index >= 10 * (this.page - 1)
+                )
+            },
+            changeSort (val) {
+                console.log(val) // column: {…} order: "ascending" prop: "date"
+                // 根据当前排序重新获取后台数据,一般后台会需要一个排序的参数
+                if(val.prop === 'totalCheckTimes'){
+                    //按照降序排序
+                    if(val.order === "descending"){
+                        let list = this.tableData.filter((item, index) =>
+                            item.residentName.includes(this.input)
+                        )
+                        this.list = list.sort((a, b) => b.totalCheckTimes - a.totalCheckTimes).filter((item, index) =>
+                            index < this.page * 10 && index >= 10 * (this.page - 1)
+                        );
+                    }
+                    //按照升序排序
+                    else if(val.order === "ascending"){
+                        let list = this.tableData.filter((item, index) =>
+                            item.residentName.includes(this.input)
+                        )
+                        this.list = list.sort((a, b) => a.totalCheckTimes - b.totalCheckTimes).filter((item, index) =>
+                            index < this.page * 10 && index >= 10 * (this.page - 1)
+                        );
+                    }
+                    else{
+                        this.getList();
+                    }
+                }else if(val.prop === 'lastSevenDayTimes'){
+                    //按照降序排序
+                    if(val.order === "descending"){
+                        let list = this.tableData.filter((item, index) =>
+                            item.residentName.includes(this.input)
+                        )
+                        this.list = list.sort((a, b) => b.lastSevenDayTimes - a.lastSevenDayTimes).filter((item, index) =>
+                            index < this.page * 10 && index >= 10 * (this.page - 1)
+                        );
+                    }
+                    //按照升序排序
+                    else if(val.order === "ascending"){
+                        let list = this.tableData.filter((item, index) =>
+                            item.residentName.includes(this.input)
+                        )
+                        this.list = list.sort((a, b) => a.lastSevenDayTimes - b.lastSevenDayTimes).filter((item, index) =>
+                            index < this.page * 10 && index >= 10 * (this.page - 1)
+                        );
+                    }
+                    else{
+                        this.getList();
+                    }
+                }else{
+                    //按照降序排序
+                    if(val.order === "descending"){
+                        let list = this.tableData.filter((item, index) =>
+                            item.residentName.includes(this.input)
+                        )
+                        this.list = list.sort((a, b) => b.lastSevenDayHighTimes - a.lastSevenDayHighTimes).filter((item, index) =>
+                            index < this.page * 10 && index >= 10 * (this.page - 1)
+                        );
+                    }
+                    //按照升序排序
+                    else if(val.order === "ascending"){
+                        let list = this.tableData.filter((item, index) =>
+                            item.residentName.includes(this.input)
+                        )
+                        this.list = list.sort((a, b) => a.lastSevenDayHighTimes - b.lastSevenDayHighTimes).filter((item, index) =>
+                            index < this.page * 10 && index >= 10 * (this.page - 1)
+                        );
+                    }
+                    else{
+                        this.getList();
+                    }
+                }
+            },
+            getDetail(residentId){
+                parent.app.getResidentDetail(residentId);
+            }
+        }
+    })
+</script>
+</body>
+</html>

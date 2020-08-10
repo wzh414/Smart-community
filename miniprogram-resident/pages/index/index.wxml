@@ -1,0 +1,39 @@
+<!--index.wxml-->
+<view>
+  <view class="login" wx:if="{{userInfo == null}}">
+    <image class="defaultImage" src="/images/icon/user2.png"></image>
+    <button class='bottom' type='primary' open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="bindGetUserInfo">
+            授权登录
+        </button>
+  </view>
+  <view class="success" wx:else>
+    <view class="user">
+      <view class="head">
+        <image class="head-img" src="{{userInfo.avatarUrl}}" mode="aspectFit"></image>
+      </view>
+      <view class="tag">
+        <text>{{userInfo.nickName}}</text>
+        <button wx:if="{{user == null||user=='fail'}}" class="tag-btn" bindtap="toRegister">请绑定小区账号 ></button>
+      </view>
+    </view>
+    <view class="target">
+      <view class="target-item" bindtap="toMessage" wx:if="{{user != null&&user!='fail'}}">
+        <image src="/images/image/person.png" mode="aspectFit"></image>
+        <text>个人信息</text>
+      </view>
+
+      <view class="target-item" bindtap="toRecord" wx:if="{{user != null&&user!='fail'}}">
+        <image src="/images/image/record.png" mode="aspectFit"></image>
+        <text>我的出入记录</text>
+      </view>
+      
+      <view class="target-item" bindtap="toAbout">
+        <image src="/images/image/about.png" mode="aspectFit"></image>
+        <text>关于</text>
+      </view>
+    </view>
+  </view>
+</view>
+<tabar bottom='{{bottom}}' />
+
+<wxs module="tool" src="tool.wxs" />

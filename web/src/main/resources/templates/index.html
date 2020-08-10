@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+    <link rel="stylesheet" href="https://css-1300972980.cos.ap-shanghai.myqcloud.com/use/root.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.2/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/v-charts/lib/style.min.css">
+
+</head>
+<body>
+<div id="app">
+    <el-card class="box-card">
+        <div slot="header" class="clearfix">
+            <span>近7天小区出入数据</span>
+            <el-button style="color: #F56C6C; float: right; padding: 3px 0" type="text" @click="showHigh">近7日体温异常风险住户</el-button>
+        </div>
+        <ve-line :data="chartData"
+                 :loading="chartLoad1"
+                 :colors="colors">
+
+        </ve-line>
+    </el-card>
+    <el-card class="box-card">
+        <div slot="header" class="clearfix">
+            <span>今日小区出入数据</span>
+        </div>
+        <ve-pie :data="chartData2"
+                :events="chartEvents"
+                :colors="colors">
+        </ve-pie>
+    </el-card>
+
+    </div>
+</div>
+
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/init/root.js"></script>
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/use/vue/vue.min.js"></script>
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/use/element-ui/element-ui-index.js"></script>
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/use/axios/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/v-charts/lib/index.min.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data() {
+            this.colors = ['#6ce2c7','#f66e86']
+            let self = this;
+            this.chartEvents = {
+                click: function (e) {
+                    console.log(e)
+                }
+            }
+            return {
+                chartData: {
+                    columns: ['日期', '体温正常', '体温偏高'],
+                    rows: []
+                },
+                chartData2: {
+                    columns: ['日期', '访问用户'],
+                    rows: []
+                },
+                chartLoad1:false,
+                chartLoad2:false
+            }
+        },
+        mounted() {
+            this.getLineList();
+            this.getPieList();
+        },
+        methods: {
+            getLineList(){
+                this.chartLoad1 = true;
+                axios.post('/health/data/getLineCharts')
+                    .then((res) => {
+                        this.chartLoad1 = false;
+                        var list = res.data;
+                        this.chartData.rows = [];
+                        for(let key in list) {
+                            this.chartData.rows.push({'日期': list[key].date, '体温正常': list[key].normal, '体温偏高': list[key].high});
+                        }
+                    }).catch(() => {
+                    this.chartLoad1 = false;
+                    this.$message({
+                        type: 'error',
+                        message: '获取数据失败，请重试'
+                    });
+                });
+            },
+            getPieList(){
+                this.chartLoad2 = true;
+                axios.post('/health/data/getPieCharts')
+                    .then((res) => {
+                        console.log(res.data)
+                        this.chartLoad2 = false;
+                        this.chartData2.rows = [];
+                        this.chartData2.rows.push({'日期': '体温正常', '访问用户': res.data.normal});
+                        this.chartData2.rows.push({'日期': '体温偏高', '访问用户': res.data.high});
+                    }).catch(() => {
+                    this.chartLoad2 = false;
+                    this.$message({
+                        type: 'error',
+                        message: '获取数据失败，请重试'
+                    });
+                });
+            },
+            showHigh(){
+                parent.app.getHighInfo();
+            }
+        }
+    })
+</script>
+</body>
+</html>

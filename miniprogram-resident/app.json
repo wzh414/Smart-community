@@ -1,0 +1,36 @@
+{
+  "pages":[
+    "pages/index/index",
+    "pages/account/account",
+    "pages/register/register",
+    "pages/message/message",
+    "pages/article/article",
+    "pages/list/list"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "客户",
+    "navigationBarTextStyle":"black"
+  },
+  "tabBar": {
+    "custom": true,
+    "list": [
+      {
+        "pagePath": "pages/account/account",
+        "iconPath": "/images/icon/first.png",
+        "selectedIconPath": "/images/icon/selectFirst.png",
+        "text": "我的通行码"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "/images/icon/user.png",
+        "selectedIconPath": "/images/icon/selectUser.png",
+        "text": "个人"
+      }
+    ]
+    
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

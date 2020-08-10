@@ -1,0 +1,79 @@
+/**index.wxss**/
+.login{
+  height: 500rpx;
+  margin-top: 30%;
+}
+.defaultImage{
+  width: 120rpx;
+  height: 120rpx;
+  margin-left: 42%;
+  margin-top: 70rpx;
+}
+.bottom{
+  margin-top: 100rpx;
+}
+.head{
+  margin-top:20rpx;
+}
+.head-img{
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%
+}
+.user{
+  width: 730rpx;
+  height: 160rpx;
+  display: flex;
+  margin-left: 10rpx;
+  margin-top: 20rpx;
+  border-radius: 10rpx;
+  box-shadow: 0rpx 0rpx 4rpx #666
+}
+.tag{
+  flex: 1;
+  margin-left: 20rpx;
+  margin-top: 20rpx;
+}
+.tag text{
+  padding-left:20rpx;
+  font-size: 40rpx;
+}
+.tag-btn{
+  height: 40rpx;
+  width: 210rpx !important;
+  line-height: 8rpx;
+  font-size: 20rpx;
+  margin-left: 10rpx !important;
+  text-align: left;
+  padding-left: 0 !important;
+  font-weight: 500
+}
+.target{
+  margin-left: 10rpx;
+  width: 730rpx;
+  margin-top: 120rpx;
+  min-height: 80rpx;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10rpx;
+  box-shadow: 0rpx 0rpx 4rpx #666
+}
+.target-item{
+  display: flex;
+  flex: 1;
+  height: 90rpx;
+}
+.target-item image{
+  height: 60rpx;
+  width: 60rpx;
+  padding-top: 15rpx;
+  padding-left: 5rpx
+}
+.target-item text{
+  padding-left: 30rpx;
+  flex: 1;
+  line-height: 85rpx;
+  font-size: 30rpx;
+  font-family: Arial,Verdana,Sans-serif;
+  color: #686868
+}

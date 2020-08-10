@@ -1,0 +1,30 @@
+<!--pages/list/list.wxml-->
+<view class="table">
+  <view class="tr bg-w">
+    <view class="th">姓名</view>
+    <view class="th ">录入时间</view>
+    <view class="th ">录入体温</view>
+  </view>
+  <block wx:if="{{listData.length != 0}}">
+    <block wx:for="{{listData}}" wx:key="index">
+      <view class="tr bg-g" wx:if="{{index % 2 == 0}}">
+        <view class="td">{{item.residentName}}</view>
+        <view class="td">{{tool.split(item.createTime)}}</view>
+        <view class="td {{item.temperature>38?'warn':''}}">{{item.temperature}}℃</view>
+      </view>
+
+      <view class="tr" wx:else>
+        <view class="td">{{item.residentName}}</view>
+        <view class="td">{{tool.split(item.createTime)}}</view>
+        <view class="td {{item.temperature>38?'warn':''}}">
+        {{item.temperature}}℃</view>
+      </view>
+    </block>
+  </block>  
+  <view class="noList" wx:else>
+    今日暂无记录
+  </view>
+</view>
+
+<wxs src="tool.wxs" module="tool" />
+

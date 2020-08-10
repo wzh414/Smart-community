@@ -1,0 +1,48 @@
+<!--pages/account/account.wxml-->
+<view class="body">
+  <view class="body-title" hidden="{{targetHiden}}">
+    <view class="title-one">
+      <text class="one">xxx小区通行码</text>
+      <text class="close" bindtap="closeTarget">x</text>
+    </view>
+    <view class="title-two">
+      <text>姓名:{{user.user.residentName}}</text>
+      <text class="two">所在单元：{{user.user.homeNumber}}</text>
+    </view>
+  </view>
+  <view class="icon-box tips" wx:if="{{userInfo == null}}" >
+			<i class="weui-icon-info weui-icon_msg"></i>
+			<view class="icon-box__ctn">
+				<h3 class="icon-box__title">提示</h3>
+				<view class="icon-box__desc setColor">您未进行登录操作，请先进行登录操作</view>
+			</view>
+	</view>
+  <view class="icon-box tips" wx:elif="{{user == null||user=='fail'}}">
+			<i class="weui-icon-info weui-icon_msg"></i>
+			<view class="icon-box__ctn">
+				<h3 class="icon-box__title">提示</h3>
+				<view class="icon-box__desc setColor">检测到你没有小区账号，请前往个人页面注册</view>
+			</view>
+	</view>
+  <view class="icon-box tips" wx:elif="{{user.user.locked}}">
+			<i class="weui-icon-info weui-icon_msg"></i>
+			<view class="icon-box__ctn">
+				<h3 class="icon-box__title">提示</h3>
+				<view class="icon-box__desc setColor">
+          你的账号已被锁定无法生成二维码,请尝试刷新
+        </view>
+			</view>
+	</view>
+  <view class="code" wx:else>
+    <text>请将通行码展示给工作人员</text>
+    <image src="data:image/png;base64,{{user.image}}" mode="aspectFit"></image>
+    <text class="flash">通行码</text>
+    <a bindtap="refresh">刷新</a>
+  </view>
+</view>
+<tabar bottom='{{bottom}}'/>
+  
+
+
+
+

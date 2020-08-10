@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="https://css-1300972980.cos.ap-shanghai.myqcloud.com/use/root.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.2/theme-chalk/index.css">
+
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+        body{
+            margin: 0;
+            background-color: unset;
+            color: unset;
+            height: 880px;
+        }
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+
+        .el-aside {
+            color: #333;
+        }
+
+        .el-table .warning-row {
+            background: oldlace;
+        }
+    </style>
+</head>
+<body>
+<div id="app" style="height: 1080px" v-cloak>
+
+    <el-container style="height: 100%; border: 1px solid #eee">
+        <el-scrollbar style="height:1080px;" :wrapStyle="[{'overflow-x':'hidden'}]">
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+            <div style="height: 1080px;background-color: #304156">
+            <el-menu
+                    default-active="1"
+                    class="el-menu-vertical-demo"
+                    background-color="#304156"
+                    text-color="#fff"
+                    active-text-color="#ffd04b">
+                <el-menu-item index="1" @click="changeFrame('/index','首页')">
+                    <i class="el-icon-odometer"></i>
+                    <span slot="title">首页</span>
+                </el-menu-item>
+                <el-menu-item index="2" @click="changeFrame('/ManageAdmin','管理员账号管理')" v-if="user.role === 'ROLE_SUPERADMIN'">
+                    <i class="el-icon-menu"></i>
+                    <span slot="title">管理员账号管理</span>
+                </el-menu-item>
+                <el-menu-item index="3" @click="changeFrame('/ManageCheck','检查人员账号管理')">
+                    <i class="el-icon-user-solid"></i>
+                    <span slot="title">检查人员账号管理</span>
+                </el-menu-item>
+                <el-menu-item index="4" @click="changeFrame('/ManageResident','住户账号管理')">
+                    <i class="el-icon-user"></i>
+                    <span slot="title">住户账号管理</span>
+                </el-menu-item>
+                <el-menu-item index="5" @click="changeFrame('/AccessDataDetail','小区出入数据详情')">
+                    <i class="el-icon-s-order"></i>
+                    <span slot="title">小区出入数据详情</span>
+                </el-menu-item>
+                <el-menu-item index="6" @click="changeFrame('/HealthDataDetail','住户健康状况详情')">
+                    <i class="el-icon-s-claim"></i>
+                    <span slot="title">住户健康状况详情</span>
+                </el-menu-item>
+            </el-menu>
+            </div>
+        </el-aside>
+        </el-scrollbar>
+
+        <el-container>
+            <el-header style="text-align: right; font-size: 20px">
+                <span style="float: left">
+                    {{frameName}}
+                </span>
+                <span>{{user.nickname}}</span>
+                <el-dropdown style="cursor: pointer;height: 50px" @command="handleCommand">
+                    <div class="block" style="margin-top: 5px"><el-avatar shape="square" :size="50" :src="squareUrl" ></el-avatar></div>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item>退出登录</el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+            </el-header>
+
+            <el-main style="padding: unset">
+                <iframe
+                        id="iframe"
+                        :src="iframeSrc"
+                        width="100%"
+                        height="99%"
+                        scrolling="no"
+                        frameborder="0">
+                </iframe>
+            </el-main>
+        </el-container>
+    </el-container>
+
+    <el-dialog
+            title="新增管理员"
+            :visible.sync="addAdminVisible"
+            width="30%"
+            >
+        <el-form :model="addAdminForm" status-icon :rules="addAdminRules" ref="addAdminForm" label-width="100px" class="demo-ruleForm">
+            <el-form-item label="账号" prop="username">
+                <el-input v-model="addAdminForm.username" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="password">
+                <el-input type="password" v-model="addAdminForm.password" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="昵称" prop="nickname">
+                <el-input v-model="addAdminForm.nickname" autocomplete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="addAdminVisible = false">取 消</el-button>
+            <el-button type="primary" @click="submitAddAdminForm()">确 定</el-button>
+        </span>
+    </el-dialog>
+
+    <el-dialog
+            title="新增检查人员"
+            :visible.sync="addCheckVisible"
+            width="30%"
+    >
+        <el-form :model="addCheckForm" status-icon :rules="addCheckRules" ref="addCheckForm" label-width="100px" class="demo-ruleForm">
+            <el-form-item label="账号" prop="username">
+                <el-input v-model="addCheckForm.username" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="password">
+                <el-input type="password" v-model="addCheckForm.password" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="昵称" prop="nickname">
+                <el-input v-model="addCheckForm.nickname" autocomplete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="addCheckVisible = false">取 消</el-button>
+            <el-button type="primary" @click="submitAddCheckForm()">确 定</el-button>
+        </span>
+    </el-dialog>
+
+    <el-dialog
+            title="出入数据详情"
+            :visible.sync="residentDetailVisible"
+            width="50%"
+    >
+        <el-table
+                :data="tableData"
+                v-loading="detailLoad"
+                @sort-change="changeSort"
+                :row-class-name="tableRowClassName"
+                height="250"
+                style="width: 100%">
+            <el-table-column
+                    label="检查时间"
+                    prop="createTime"
+                    sortable
+                    width="250">
+                <template slot-scope="scope">
+                    <span>{{scope.row.createTime | dateFormat}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                    prop="residentName"
+                    label="住户姓名"
+                    width="250">
+            </el-table-column>
+            <el-table-column
+                    prop="checkerName"
+                    label="检查人员"
+                    width="250">
+            </el-table-column>
+            <el-table-column
+                    prop="temperature"
+                    sortable
+                    label="登记体温"
+                    >
+            </el-table-column>
+        </el-table>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" icon="el-icon-document" @click="handleExport">导出数据到Excel</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog
+            title="近7日内体温异常住户"
+            :visible.sync="abnormalVisible"
+            width="60%"
+    >
+        <el-table
+                :data="abnormalData"
+                v-loading="abnormalLoad"
+                height="250"
+                style="width: 100%">
+            <el-table-column
+                    fixed
+                    prop="residentName"
+                    label="住户姓名"
+                    width="200">
+            </el-table-column>
+            <el-table-column
+                    prop="idCardNumber"
+                    label="身份证号"
+                    width="200">
+            </el-table-column>
+            <el-table-column
+                    prop="homeNumber"
+                    label="住户房号"
+                    width="200">
+            </el-table-column>
+            <el-table-column
+                    prop="lastSevenDayHighTimes"
+                    label="最近7日体温异常次数"
+                    width="200">
+            </el-table-column>
+            <el-table-column
+                    label="住户状态"
+                    width="200">
+                <template slot-scope="scope">
+                    <el-tag v-if="scope.row.locked===0" size="medium">正常</el-tag>
+                    <el-tag v-else type="danger" size="medium">锁定</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column
+                    label="操作"
+            >
+                <template slot-scope="scope">
+                    <el-button v-if="scope.row.locked===0" size="mini" type="info" @click="handleDisable(scope.$index,scope.row)">锁定住户</el-button>
+                    <el-button v-else size="mini" type="warning" @click="handleEnable(scope.$index,scope.row)">解除锁定</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-dialog>
+</div>
+
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/init/root.js"></script>
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/use/vue/vue.min.js"></script>
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/use/element-ui/element-ui-index.js"></script>
+<script src="https://js-1300972980.cos.ap-shanghai.myqcloud.com/use/axios/axios.min.js"></script>
+<script>
+    Vue.filter('dateFormat',function (dateStamp) {
+        var date = new Date(dateStamp);
+        var Y = date.getFullYear() + '-';
+        var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+        var D = (date.getDate() < 10 ? '0'+date.getDate() : date.getDate()) + ' ';
+        var h = ('0'+date.getHours()).substr(-2) + ':';
+        var m = ('0'+date.getMinutes()).substr(-2) + ':';
+        var s = ('0'+date.getSeconds()).substr(-2);
+        return Y+M+D+h+m+s;
+    });
+    var app = new Vue({
+        el: '#app',
+        data() {
+            var validateUsername = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入用户名'));
+                } else {
+                    if (!value.match(/^[a-zA-Z0-9]+$/)) {
+                        callback(new Error('用户名非法'));
+                    }
+                    else {
+                        callback();
+                    }
+                }
+            };
+            var validatePass = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入密码'));
+                } else {
+                    if (!value.match(/^[@!\-#$%&*a-zA-Z0-9]+$/)) {
+                        callback(new Error('输入的密码非法'));
+                    }
+                    else {
+                        callback();
+                    }
+                }
+            };
+            var validateNickname = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入昵称'));
+                } else {
+                    if (value.indexOf(" ") > -1) {
+                        callback(new Error('昵称非法'));
+                    }
+                    else {
+                        callback();
+                    }
+                }
+            };
+            return {
+                user:{
+                    nickname:'',
+                    role:''
+                },
+                squareUrl: "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80",
+                iframeSrc:'/index',
+                frameName:'首页',
+                addAdminVisible:false,
+                addCheckVisible:false,
+                residentDetailVisible:false,
+                abnormalVisible:false,
+                detailLoad: false,
+                abnormalLoad: false,
+                addAdminForm:{
+                    username:'',
+                    password:'',
+                    nickname:'',
+                },
+                addCheckForm:{
+                    username:'',
+                    password:'',
+                    nickname:'',
+                },
+                addAdminRules: {
+                    username: [{validator: validateUsername, trigger: 'blur'}],
+                    password: [{validator: validatePass, trigger: 'blur'}],
+                    nickname: [{validator: validateNickname, trigger: 'blur'}],
+                },
+                addCheckRules: {
+                    username: [{validator: validateUsername, trigger: 'blur'}],
+                    password: [{validator: validatePass, trigger: 'blur'}],
+                    nickname: [{validator: validateNickname, trigger: 'blur'}],
+                },
+                tableData: [],
+                abnormalData: []
+            }
+        },
+        mounted() {
+            this.getUserInfo();
+        },
+        methods: {
+            tableRowClassName({row, rowIndex}) {
+                if (row.temperature > 38) {
+                    return 'warning-row';
+                }
+                return '';
+            },
+            changeSort (val) {
+                console.log(val) // column: {…} order: "ascending" prop: "date"
+                // 根据当前排序重新获取后台数据,一般后台会需要一个排序的参数
+                    //按照降序排序
+                    if(val.order === "descending"){
+                        this.abnormalData = this.abnormalData.sort((a, b) => b.createTime - a.createTime);
+                    }
+                    //按照升序排序
+                    else if(val.order === "ascending"){
+                        this.abnormalData = this.abnormalData.sort((a, b) => a.createTime - b.createTime);
+                    }
+
+            },
+            handleCommand() {
+                axios.post('/signout')
+                    .then ((res)=>{
+                        window.location.href = '/login';
+                    }).catch((error)=> {
+                    this.$message({
+                        type: 'error',
+                        message: '退出登录失败，请重试'
+                    });
+                })
+            },
+            changeFrame(src,name){
+                this.iframeSrc = src;
+                this.frameName = name;
+            },
+            submitAddAdminForm() {
+                this.$refs.addAdminForm.validate((valid) => {
+                    if (valid) {
+                        this.addAdminVisible = false;
+                        axios.post('/admin/data/addOneAdmin', 'username='+this.addAdminForm.username+
+                            '&password='+this.addAdminForm.password+'&nickname='+this.addAdminForm.nickname)
+                            .then ((res)=>{
+                                if(res.data === 'success'){
+                                    this.$message({
+                                        type: 'success',
+                                        message: '添加成功'
+                                    });
+                                    this.addAdminForm.username = '';
+                                    this.addAdminForm.password = '';
+                                    this.addAdminForm.nickname = '';
+                                    document.getElementById('iframe').contentWindow.app.getAdminList();
+                                }else if(res.data === 'exits'){
+                                    this.$message({
+                                        type: 'error',
+                                        message: '账号已存在，添加失败'
+                                    });
+                                } else{
+                                    this.$message({
+                                        type: 'error',
+                                        message: '添加失败，请重试'
+                                    });
+                                }
+                            }).catch(()=> {
+                            this.$message({
+                                type: 'error',
+                                message: '添加错误，请重试'
+                            });
+                        })
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            submitAddCheckForm() {
+                this.$refs.addCheckForm.validate((valid) => {
+                    if (valid) {
+                        this.addCheckVisible = false;
+                        axios.post('/check/data/addOneCheck', 'username='+this.addCheckForm.username+
+                            '&password='+this.addCheckForm.password+'&nickname='+this.addCheckForm.nickname)
+                            .then ((res)=>{
+                                if(res.data === 'success'){
+                                    this.$message({
+                                        type: 'success',
+                                        message: '添加成功'
+                                    });
+                                    this.addCheckForm.username = '';
+                                    this.addCheckForm.password = '';
+                                    this.addCheckForm.nickname = '';
+                                    document.getElementById('iframe').contentWindow.app.getCheckList();
+                                }else if(res.data === 'exits'){
+                                    this.$message({
+                                        type: 'error',
+                                        message: '账号已存在，添加失败'
+                                    });
+                                } else{
+                                    this.$message({
+                                        type: 'error',
+                                        message: '添加失败，请重试'
+                                    });
+                                }
+                            }).catch(()=> {
+                            this.$message({
+                                type: 'error',
+                                message: '添加错误，请重试'
+                            });
+                        })
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            getResidentDetail(residentId){
+                this.residentDetailVisible = true;
+                this.detailLoad = true;
+                axios.post('/health/data/getResidentDetail','residentId='+residentId)
+                    .then ((res)=>{
+                        this.tableData = res.data;
+                        this.detailLoad = false;
+                    }).catch((error)=> {
+                    this.$message({
+                        type: 'error',
+                        message: '获取数据失败，请重试'
+                    });
+                    this.detailLoad = false;
+                })
+            },
+            timestampToTime (cjsj) {
+                var date = new Date(cjsj) //时间戳为10位需*1000，时间戳为13位的话不需乘1000
+                var Y = date.getFullYear() + '-'
+                var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
+                var D = date.getDate() + ' '
+                var h = date.getHours() + ':'
+                var m = date.getMinutes() + ':'
+                var s = date.getSeconds()
+                return Y+M+D+h+m+s
+            },
+            handleExport(){
+                var residentId
+                if(this.tableData.length === 0) {
+                    residentId = '0';
+                }else{
+                    residentId = this.tableData[0].residentId;
+                }
+                window.location.href = "/health/data/residentDetailDownload?residentId="+residentId;
+            },
+            getUserInfo(){
+                axios.post('/getUserInfo')
+                    .then ((res)=>{
+                        this.user.nickname = res.data.nickname;
+                        this.user.role = res.data.role;
+                    }).catch((error)=> {
+                    this.$message({
+                        type: 'error',
+                        message: '获取数据失败，请重试'
+                    });
+                    this.detailLoad = false;
+                })
+            },
+            getHighInfo(){
+                this.abnormalVisible = true;
+                this.abnormalLoad = true;
+                axios.post('/health/data/getHighInfo')
+                    .then ((res)=>{
+                        this.abnormalData = res.data;
+                        this.abnormalLoad = false;
+                    }).catch((error)=> {
+                    this.$message({
+                        type: 'error',
+                        message: '获取数据失败，请重试'
+                    });
+                    this.abnormalLoad = false;
+                })
+            },
+            handleDisable(index, row){
+                this.$confirm('此操作将锁定该住户, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post('/resident/data/disableResident', 'residentId='+this.abnormalData[index].residentId)
+                        .then ((res)=>{
+                            if(res.data === 'success'){
+                                this.$message({
+                                    type: 'success',
+                                    message: '锁定成功'
+                                });
+                                this.abnormalData[index].locked = 1;
+                            }else{
+                                this.$message({
+                                    type: 'error',
+                                    message: '锁定失败，请重试'
+                                });
+                            }
+                        }).catch(()=> {
+                        this.$message({
+                            type: 'error',
+                            message: '锁定错误，请重试'
+                        });
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消锁定'
+                    });
+                });
+            },
+            handleEnable(index, row){
+                this.$confirm('此操作将解锁该住户, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post('/resident/data/enableResident', 'residentId='+this.abnormalData[index].residentId)
+                        .then ((res)=>{
+                            if(res.data === 'success'){
+                                this.$message({
+                                    type: 'success',
+                                    message: '解锁成功'
+                                });
+                                this.abnormalData[index].locked = 0;
+                            }else{
+                                this.$message({
+                                    type: 'error',
+                                    message: '解锁失败，请重试'
+                                });
+                            }
+                        }).catch(()=> {
+                        this.$message({
+                            type: 'error',
+                            message: '解锁错误，请重试'
+                        });
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消解锁'
+                    });
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

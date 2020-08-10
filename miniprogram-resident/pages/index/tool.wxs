@@ -1,0 +1,7 @@
+function judge(user){
+  return user;
+}
+
+module.exports = {
+  judge:judge
+}

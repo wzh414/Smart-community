@@ -1,0 +1,30 @@
+/* pages/user/user.wxss */
+.page{background-color:var(--weui-BG-2)}.weui-toptips{display:block}
+
+.down{
+  margin-top: 120rpx;
+}
+.btn{
+  margin-top: 30rpx;
+}
+.temperature{
+  display: flex;
+  flex-direction: column;
+}
+.data{
+  flex: 1;
+  display: block;
+  font-size: 37rpx;
+}
+.input{
+  margin-top: 15rpx;
+  display: flex;
+}
+.input text{
+  font-size: 37rpx;
+  width: auto;
+}
+.input input{
+  display: 1;
+  border-bottom: black solid 1rpx;
+}
